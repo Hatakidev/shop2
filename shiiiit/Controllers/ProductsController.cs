@@ -7,116 +7,89 @@ namespace shiiiit.Controllers
 {
     [Route("api/Products")]
     [ApiController]
-    public class ProductsController : ControllerBase
-    {
-        private readonly ShopContext _context;
+    //api/Products или api/Products/1
+    public class ProductsController
+    { 
         private readonly IRepository _repo;
 
-        public ProductsController(ShopContext context, IRepository repo)
+        public ProductsController(IRepository repo)
         {
-            _context = context;
             _repo = repo;
         }
 
-        // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
-        {
-          if (_context.Products == null)
-          {
-              return NotFound();
-          }
+        public async Task<IEnumerable<Product>> GetProducts()
+        {          
             return await _repo.GetAllProducts();
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> SearchProducts(string value)
+        public async Task<IEnumerable<Product>> SearchProducts(string value)
         {
-            if (_context.Products == null) return NotFound();
-            if(value == null) return BadRequest();
             return await _repo.SearchProducts(value);
         }
+        [HttpGet]
+        public async Task<IEnumerable<Product>> SortByProductName()
+        {
+            return await _repo.SortByProductName();
+        }
+        [HttpGet]
+        public async Task<IEnumerable<Product>> SortByProductNameDescending()
+        {
+            return await _repo.SortByProductNameDescending();
+        }
+        [HttpGet]
+        public async Task<IEnumerable<Product>> SortByProductDate()
+        {
+            return await _repo.SortByProductDate();
+        }
+        [HttpGet]
+        public async Task<IEnumerable<Product>> SortByProductDateDescending()
+        {
+            return await _repo.SortByProductDateDescending();
+        }
+        [HttpGet]
+        public async Task<IEnumerable<Product>> SortByProductPrice()
+        {
+            return await _repo.SortByProductPrice();
+        }
+        [HttpGet]
+        public async Task<IEnumerable<Product>> SortByProductPriceDescending()
+        {
+            return await _repo.SortByProductPriceDescending();
+        }
 
-        // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(Guid id)
         {
-          if (_context.Products == null)
-          {
-              return NotFound();
-          }
             var product = await _repo.GetProduct(id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-
             return product;
         }
         [HttpGet("{catid}")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProductsByCategory(Guid catId)
+        public async Task<IEnumerable<Product>> GetProductsByCategory(Guid catId)
         {
-            if(_context.Products == null) return NotFound();
             return await _repo.GetByCategoryProducts(catId);
-           
         }
 
-        // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(Guid id, Product product)
+        public async Task PutProduct(Guid id, Product product)
         {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
-            
-
-            try
-            {
-                await _repo.UpdateProduct(product);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            await _repo.UpdateProduct(product, id);
+            return;
         }
 
-        // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<Product> PostProduct(Product product)
         {
             await _repo.CreateProduct(product);
-            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+            return product;
         }
 
-        // DELETE: api/Products/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        public async Task DeleteProduct(Guid id)
         {
-            if (_context.Products == null)
-            {
-                return NotFound();
-            }
             await _repo.DeleteProduct(id);
 
-            return NoContent();
-        }
-
-        private bool ProductExists(Guid id)
-        {
-            return (_context.Products?.Any(e => e.Id == id)).GetValueOrDefault();
+            return;
         }
     }
 }

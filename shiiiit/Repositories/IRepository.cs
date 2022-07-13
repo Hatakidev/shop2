@@ -4,22 +4,28 @@ namespace shiiiit.Repositories
 {
     public interface IRepository : IDisposable
     {
-        Task<User> GetUser(Guid id);
-        Task<ActionResult<IEnumerable<UserDTO>>> GetAllUsers();
+        Task<UserDTO> GetUser(Guid id);
+        Task<IEnumerable<UserDTO>> GetAllUsers();
         Task CreateUser(User user);
-        Task UpdateUser(User user);
+        Task UpdateUser(Guid id, User user);
         Task DeleteUser(Guid id);
-        Task<ActionResult<IEnumerable<Product>>> GetAllProducts();
-        Task<ActionResult<IEnumerable<Product>>> GetByCategoryProducts(Guid catid);
-        Task<ActionResult<IEnumerable<Product>>> SearchProducts(string value);
+        Task<IEnumerable<Product>> GetAllProducts();
+        Task<IEnumerable<Product>> GetByCategoryProducts(Guid catid);
+        Task<IEnumerable<Product>> SearchProducts(string value);
+        Task<IEnumerable<Product>> SortByProductName();
+        Task<IEnumerable<Product>> SortByProductNameDescending();
+        Task<IEnumerable<Product>> SortByProductDate();
+        Task<IEnumerable<Product>> SortByProductDateDescending();
+        Task<IEnumerable<Product>> SortByProductPrice();
+        Task<IEnumerable<Product>> SortByProductPriceDescending();
         Task<Product> GetProduct(Guid id);
         Task CreateProduct(Product product);
-        Task UpdateProduct(Product product);
+        Task UpdateProduct(Product product, Guid id);
         Task DeleteProduct(Guid id);
-        Task<ActionResult<IEnumerable<Category>>> GetAllCategories();
+        Task<IEnumerable<Category>> GetAllCategories();
         Task<Category> GetCategory(Guid id);
         Task CreateCategory(Category category);
-        Task UpdateCategory(Category category);
+        Task UpdateCategory(Category category, Guid id);
         Task DeleteCategory(Guid id);
     }
 }

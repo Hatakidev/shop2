@@ -8,14 +8,14 @@ namespace shiiiit.Repositories
     {
         
         private readonly ShopContext context;
-        private readonly Product product;
         
-        public async Task<User> GetUser(Guid id)
+        public async Task<UserDTO> GetUser(Guid id)
         {
-            return await context.Users.FindAsync(id);
+            var user =  await context.Users.FindAsync(id);
+            return UseDTO(user);
         }
         
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetAllUsers()
+        public async Task<IEnumerable<UserDTO>> GetAllUsers()
         {
             return await context.Users.Select(x => UseDTO(x)).ToListAsync();
         }
@@ -26,8 +26,9 @@ namespace shiiiit.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task UpdateUser(User user)
+        public async Task UpdateUser(Guid id, User user)
         {
+            if (id != user.Id) return;
             context.Entry(user).State = EntityState.Modified;
             await context.SaveChangesAsync();
         }
@@ -39,19 +40,51 @@ namespace shiiiit.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<ActionResult<IEnumerable<Product>>> GetAllProducts()
+        public async Task<IEnumerable<Product>> GetAllProducts()
         {
             return await context.Products.ToListAsync();
         }
 
-        public async Task<ActionResult<IEnumerable<Product>>> GetByCategoryProducts(Guid id)
+        public async Task<IEnumerable<Product>> GetByCategoryProducts(Guid id)
         {
             return await context.Products.Where(x => x.CategoryID == id).ToListAsync();
         }
-        public async Task<ActionResult<IEnumerable<Product>>> SearchProducts(string value)
+
+        public async Task<IEnumerable<Product>> SearchProducts(string value)
         {
             return await context.Products.Where(x => x.ProductName.Contains(value) || x.Seller.Contains(value)).ToListAsync();
         }
+
+        public async Task<IEnumerable<Product>> SortByProductName()
+        {
+            return await context.Products.OrderBy(x => x.ProductName).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> SortByProductNameDescending()
+        {
+            return await context.Products.OrderByDescending(x => x.ProductName).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> SortByProductDate()
+        {
+            return await context.Products.OrderBy(x => x.DateTime).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> SortByProductDateDescending()
+        {
+            return await context.Products.OrderByDescending(x => x.DateTime).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> SortByProductPrice()
+        {
+            return await context.Products.OrderBy(x => x.Price).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Product>> SortByProductPriceDescending()
+        {
+            return await context.Products.OrderByDescending(x => x.Price).ToListAsync();
+        }
+
 
         public async Task CreateProduct(Product product)
         {
@@ -64,8 +97,9 @@ namespace shiiiit.Repositories
             return await context.Products.FindAsync(id);
         }
 
-        public async Task UpdateProduct(Product product)
+        public async Task UpdateProduct(Product product, Guid id)
         {
+            if (id != product.Id) return;
             context.Entry(product).State = EntityState.Modified;
             await context.SaveChangesAsync();
         }
@@ -77,7 +111,7 @@ namespace shiiiit.Repositories
             await context.SaveChangesAsync();
         }
 
-        public async Task<ActionResult<IEnumerable<Category>>> GetAllCategories()
+        public async Task<IEnumerable<Category>> GetAllCategories()
         {
             return await context.Categories.ToListAsync();
         }
@@ -93,8 +127,9 @@ namespace shiiiit.Repositories
             context.SaveChanges();
         }
 
-        public async Task UpdateCategory(Category category)
+        public async Task UpdateCategory(Category category, Guid id)
         {
+            if (id != category.Id) return;
             context.Entry(category).State = EntityState.Modified;
             await context.SaveChangesAsync();
         }

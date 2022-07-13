@@ -7,115 +7,48 @@ namespace WebApplication1.Controllers
 {
     [Route("api/Users")]
     [ApiController]
-
-    public class UsersController : ControllerBase
+    //api/Users или api/Users/1
+    public class UsersController 
     {
 
-        private readonly ShopContext _context;
         private readonly IRepository _repo;
 
-        public UsersController(ShopContext context, IRepository repo)
+        public UsersController(IRepository repo)
         {
-            _context = context;
             _repo = repo;
         }
 
-        // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<UserDTO>>> GetUsers()
+        public async Task<IEnumerable<UserDTO>> GetUsers()
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
             return await _repo.GetAllUsers();
         }
 
-        // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<UserDTO>> GetUser(Guid id)
+        public async Task<UserDTO> GetUser(Guid id)
         {
-          if (_context.Users == null)
-          {
-              return NotFound();
-          }
-            var user = await _repo.GetUser(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return UseDTO(user);
+            return await _repo.GetUser(id);
         }
 
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(Guid id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            
-
-            try
-            {
-                await _repo.UpdateUser(user);
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+        public async Task PutUser(User user, Guid id)
+        { 
+            await _repo.UpdateUser(id, user);
+            return;
         }
 
-        // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
-
             await _repo.CreateUser(user);
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, UseDTO(user));
-
+            return user;
         }
 
-        // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task DeleteUser(Guid id)
         {
-            if (_context.Users == null)
-            {
-                return NotFound();
-            }
-           await _repo.DeleteUser(id);
-
-            return NoContent();
+            await _repo.DeleteUser(id);
+            return;
         }
-
-        private bool UserExists(Guid id)
-        {
-            return (_context.Users?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
-
-        private static UserDTO UseDTO(User user) =>
-           new()
-           {
-               Id = user.Id,
-               Name = user.Name,
-               IsSeller = user.IsSeller
-           };
     }
 }
